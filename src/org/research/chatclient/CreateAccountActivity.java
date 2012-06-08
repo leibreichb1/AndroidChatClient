@@ -38,6 +38,8 @@ public class CreateAccountActivity extends Activity {
 	public static String PREFS = "prefs_file";
 	public static String C2DM = "C2DM";
 	public static String CREATED = "created";
+	public static String USER = "user";
+	private String username;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,11 +61,10 @@ public class CreateAccountActivity extends Activity {
 					String c2dm = mPrefs.getString( CreateAccountActivity.C2DM, "" );
 					
 					final EditText userText = (EditText)findViewById(R.id.username);
-					String username = userText.getText().toString();
+					username = userText.getText().toString();
 					if(username != ""){
 				    	try{
 				    		HttpPost httppost = new HttpPost("http://devimiiphone1.nku.edu/research_chat_client/TestPhp/CreateNewUser.php");
-				    		//HttpPost httppost = new HttpPost("http://10.15.8.49:8888/TestPhp/CreateNewUser.php");
 				    		LinkedList<NameValuePair> nameValuePairs = new LinkedList<NameValuePair>();
 				    		
 				    		nameValuePairs.add(new BasicNameValuePair("username", username));
@@ -97,13 +98,10 @@ public class CreateAccountActivity extends Activity {
 	        }
 		}
 		else{
-			launchInbox();
+			Intent inboxIntent = new Intent(CreateAccountActivity.this, InboxActivity.class);
+	    	startActivity(inboxIntent);
+	    	finish();
 		}
-    }
-    
-    public void launchInbox(){
-    	Intent inboxIntent = new Intent(CreateAccountActivity.this, InboxActivity.class);
-    	startActivity(inboxIntent);
     }
     
     private class DownloadFilesTask extends AsyncTask<HttpPost, Void, InputStream> {
@@ -113,7 +111,6 @@ public class CreateAccountActivity extends Activity {
 	    	InputStream stream = null;
 	    	HttpResponse response;
 			try {
-				Log.d("Size", "" + post.length);
 				response = httpclient.execute(post[0]);
 				HttpEntity entity = response.getEntity();
 				stream = entity.getContent();
@@ -147,6 +144,7 @@ public class CreateAccountActivity extends Activity {
 	    	 if(text.trim().equals("CREATED")){
 	    		 Editor editor = getSharedPreferences( CreateAccountActivity.PREFS, Context.MODE_PRIVATE).edit();
 	    		 editor.putBoolean(CREATED, true);
+	    		 editor.putString(USER, username);
 	    		 editor.commit();
 	    		 Intent inboxIntent = new Intent(CreateAccountActivity.this, InboxActivity.class);
 	    		 startActivity(inboxIntent);
