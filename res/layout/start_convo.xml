@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rootLay"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+    <Spinner
+        android:id="@+id/personSpin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <RelativeLayout 
+        android:layout_width="match_parent"
+    	android:layout_height="match_parent"
+    	android:background="#AAA" >
+	    <Button 
+		    android:id="@+id/sendMessBtn"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_alignParentBottom="true"
+		    android:layout_alignParentRight="true"
+		    android:text="@string/send"
+		    android:onClick="sendMessage"/>
+	   	<EditText
+	   	    android:id="@+id/messageText"
+	   	    android:layout_width="match_parent"
+	   	    android:layout_height="wrap_content"
+	   	    android:layout_alignParentBottom="true"
+	   	    android:layout_toLeftOf="@+id/sendMessBtn"
+	   	    android:layout_below="@id/personSpin"
+	   	    android:layout_marginTop="10dip"
+	   	    android:ems="10"
+	   	    android:inputType="textMultiLine" />
+		<TextView 
+		    android:layout_width="match_parent"
+	   	    android:layout_height="match_parent"
+	   	    android:layout_above="@id/messageText"
+	   	    android:text="@string/conn_notif"
+	   	    android:background="#000"
+	   	    android:gravity="center" />
+	</RelativeLayout>
+</LinearLayout>
