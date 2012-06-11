@@ -62,7 +62,7 @@ public class CreateAccountActivity extends Activity {
 					
 					final EditText userText = (EditText)findViewById(R.id.username);
 					username = userText.getText().toString();
-					if(username != ""){
+					if(username != "" && c2dm != ""){
 				    	try{
 				    		HttpPost httppost = new HttpPost("http://devimiiphone1.nku.edu/research_chat_client/TestPhp/CreateNewUser.php");
 				    		LinkedList<NameValuePair> nameValuePairs = new LinkedList<NameValuePair>();
@@ -148,6 +148,7 @@ public class CreateAccountActivity extends Activity {
 	    		 editor.commit();
 	    		 Intent inboxIntent = new Intent(CreateAccountActivity.this, InboxActivity.class);
 	    		 startActivity(inboxIntent);
+	    		 finish();
 	    	 }
 	    	 else if(text.equals("EXISTS")){
 	    		 AlertDialog.Builder builder = new AlertDialog.Builder(CreateAccountActivity.this);

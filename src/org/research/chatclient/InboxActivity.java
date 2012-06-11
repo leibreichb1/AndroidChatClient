@@ -25,9 +25,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class InboxActivity extends Activity{
@@ -38,7 +43,7 @@ public class InboxActivity extends Activity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.contacts_list);
+		setContentView(R.layout.conversation_list);
 		
 		try{
     		HttpPost httppost = new HttpPost("http://devimiiphone1.nku.edu/research_chat_client/TestPhp/getMessages.php");
@@ -60,13 +65,35 @@ public class InboxActivity extends Activity{
 		    mProgress.show();
 		    
 		    new DownloadFilesTask().execute(httppost);
-    		
+    		ListView lv = (ListView)findViewById(R.id.conversation_list);
+    		registerForContextMenu(lv);
     	}catch(UnsupportedEncodingException e){
     		e.printStackTrace();
     	}
 	}
 	
-	class ContactAdapter extends BaseAdapter{
+	@Override
+    public boolean onCreateOptionsMenu( Menu menu ){
+    	super.onCreateOptionsMenu( menu );
+    	MenuInflater inflater = getMenuInflater();
+    	inflater.inflate( R.menu.menu, menu);
+    	return true;
+    }
+	
+	@Override 
+    public boolean onContextItemSelected(MenuItem item) { 
+    	if( item.getItemId() == 0 || item.getItemId() == 1 ){
+    		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+    	}
+    	switch( item.getItemId() ){
+    		case 0:
+		    	
+		    	break;
+    	}
+        return true; 
+    } 
+	
+	class ConvoAdapter extends BaseAdapter{
 		
 		ArrayList<InboxItem> mList;
 		
