@@ -43,6 +43,8 @@
           </intent-filter>
       </receiver>
         <activity android:name="InboxActivity"></activity>
+        <activity android:name="StartNewConversation"
+            android:windowSoftInputMode="adjustResize"></activity>
     </application>
 
 </manifest>

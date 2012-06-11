@@ -20,6 +20,7 @@ import org.apache.http.message.BasicNameValuePair;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -44,7 +45,6 @@ public class InboxActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.conversation_list);
-		
 		try{
     		HttpPost httppost = new HttpPost("http://devimiiphone1.nku.edu/research_chat_client/TestPhp/getMessages.php");
     		LinkedList<NameValuePair> nameValuePairs = new LinkedList<NameValuePair>();
@@ -87,11 +87,15 @@ public class InboxActivity extends Activity{
     	}
     	switch( item.getItemId() ){
     		case 0:
-		    	
-		    	break;
+    			break;
     	}
         return true; 
     } 
+	
+	public void startNewMessage(View v){
+		Intent startNewMessage = new Intent(this, StartNewConversation.class);
+		startActivity(startNewMessage);
+	}
 	
 	class ConvoAdapter extends BaseAdapter{
 		

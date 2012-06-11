@@ -9,5 +9,9 @@
     <string name="create_login">Create Login</string>
     <string name="inbox_title">All Messages</string>
     <string name="close_conversation">Close conversation</string>
+    <string name="compose_new_message">Compose New Message</string>
+    <string name="start_new_conversation">Start New Conversation</string>
+    <string name="send">Send</string>
+    <string name="conn_notif">The Conversation will appear here</string>
 
 </resources>
