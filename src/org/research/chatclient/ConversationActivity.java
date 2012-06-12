@@ -34,9 +34,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-public class ConversationActivity extends Activity implements Constants{
+public class ConversationActivity extends BaseActivity implements Constants{
 	
-	private SQLiteDatabase db;
 	private ProgressDialog mProgress;
 	private SharedPreferences mPrefs;
 	private JSONArray mUsers;
@@ -45,8 +44,6 @@ public class ConversationActivity extends Activity implements Constants{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.conversation);
-		MessagesTable table = new MessagesTable(ConversationActivity.this);
-		db = table.getWritableDatabase();
 		mPrefs = getSharedPreferences( CreateAccountActivity.PREFS, Context.MODE_PRIVATE );
 		mProgress = new ProgressDialog(ConversationActivity.this);
 	    mProgress.setIndeterminate(true);
@@ -133,61 +130,5 @@ public class ConversationActivity extends Activity implements Constants{
 			}
 	     }
 	 }
-	
-	private class SendMessageTask extends AsyncTask<HttpPost, Void, InputStream> {
-	    @Override
-		 protected InputStream doInBackground(HttpPost... post) {
-	    	HttpClient httpclient = new DefaultHttpClient();
-	    	InputStream stream = null;
-	    	HttpResponse response;
-			try {
-				response = httpclient.execute(post[0]);
-				HttpEntity entity = response.getEntity();
-				stream = entity.getContent();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-	        return stream;
-	     }
-
-	     @Override
-	     protected void onPostExecute(InputStream result) {
-	    	 String text = "";
-	    	 
-	    	 try{
-	    		 if( result != null ){
-			    	 BufferedReader br = new BufferedReader(new InputStreamReader(result));
-			    	 String line = br.readLine();
-			    	 
-			    	 while( line != null ){
-			    		 text += line + " ";
-			    		 line = br.readLine();
-			    	 }
-	    		 }
-	    	 }catch (IOException e) {
-	    		 e.printStackTrace();
-	    	 }
-	    	 Toast.makeText(ConversationActivity.this, "Message Sent", Toast.LENGTH_LONG).show();
-	    	 Log.d("Response", text);
-	     }
-	 }
-	
-	private void insertMessage(String sender, String message, String time){
-		String recipient = (String)((Spinner)findViewById(R.id.personSpin)).getSelectedItem();
-		
-		ContentValues values = new ContentValues();
-		values.put(SENDER, sender);
-		values.put(RECIPIENT, recipient);
-		values.put(MESSAGE, message);
-		values.put(TIMESTAMP, ""+time);
-		db.insert(MESSAGE_TABLE_NAME, null, values);
-	}
-	
-	@Override
-	public void onBackPressed() {
-		if(db != null && db.isOpen())
-			db.close();
-		super.onBackPressed();
-	}
 }
 

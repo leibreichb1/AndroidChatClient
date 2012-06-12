@@ -20,7 +20,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.Context;
@@ -29,7 +28,6 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,7 +39,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class InboxActivity extends Activity implements Constants{
+public class InboxActivity extends BaseActivity implements Constants{
 	
 	private SQLiteDatabase db;
 	private ProgressDialog mProgress;
@@ -73,7 +71,7 @@ public class InboxActivity extends Activity implements Constants{
 		    mProgress.setMessage("Downloading...");
 		    mProgress.show();
 		    
-		    new DownloadFilesTask().execute(httppost);
+		    new DownloadMessages().execute(httppost);
     		ListView lv = (ListView)findViewById(R.id.conversation_list);
     		registerForContextMenu(lv);
     	}catch(UnsupportedEncodingException e){
@@ -150,7 +148,7 @@ public class InboxActivity extends Activity implements Constants{
 		
 	}
 	
-	private class DownloadFilesTask extends AsyncTask<HttpPost, Void, InputStream> {
+	private class DownloadMessages extends AsyncTask<HttpPost, Void, InputStream> {
 	    @Override
 		 protected InputStream doInBackground(HttpPost... post) {
 	    	HttpClient httpclient = new DefaultHttpClient();
@@ -203,11 +201,4 @@ public class InboxActivity extends Activity implements Constants{
 				mProgress.dismiss();
 	     }
 	 }
-	
-	@Override
-	public void onBackPressed() {
-		if(db != null && db.isOpen())
-			db.close();
-		super.onBackPressed();
-	}
 }
