@@ -16,12 +16,17 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,17 +41,21 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class InboxActivity extends Activity{
+public class InboxActivity extends Activity implements Constants{
 	
+	private SQLiteDatabase db;
 	private ProgressDialog mProgress;
 	private SharedPreferences mPrefs;
+	public static String CONVO = "convo";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.conversation_list);
+		MessagesTable table = new MessagesTable(InboxActivity.this);
+		db = table.getWritableDatabase();
 		try{
-    		HttpPost httppost = new HttpPost("http://devimiiphone1.nku.edu/research_chat_client/TestPhp/getMessages.php");
+    		HttpPost httppost = new HttpPost("http://devimiiphone1.nku.edu/research_chat_client/testphp/get_messages.php");
     		LinkedList<NameValuePair> nameValuePairs = new LinkedList<NameValuePair>();
     		
     		mPrefs = getSharedPreferences( CreateAccountActivity.PREFS, Context.MODE_PRIVATE );
@@ -93,7 +102,7 @@ public class InboxActivity extends Activity{
     } 
 	
 	public void startNewMessage(View v){
-		Intent startNewMessage = new Intent(this, StartNewConversation.class);
+		Intent startNewMessage = new Intent(this, ConversationActivity.class);
 		startActivity(startNewMessage);
 	}
 	
@@ -172,12 +181,26 @@ public class InboxActivity extends Activity{
 			    	 }
 	    		 }
 	    	 }catch (IOException e) {
+	    		 e.printStackTrace();
+	    	 }
+			try {
+				JSONArray messages = new JSONArray(text);
+				String recipient = mPrefs.getString( CreateAccountActivity.USER, "" );
+				for (int i = 0; i < messages.length(); i++) {
+					JSONObject obj = messages.getJSONObject(i);
+					ContentValues values = new ContentValues();
+					values.put(SENDER, obj.getString(SENDER));
+					values.put(RECIPIENT, recipient);
+					values.put(MESSAGE, obj.getString(MESSAGE));
+					values.put(TIMESTAMP, obj.getString(TIMESTAMP));
+					db.insert(MESSAGE_TABLE_NAME, null, values);
+				}
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-	    	 
-	    	 if(mProgress.isShowing())
-	    		 mProgress.dismiss();
-	    	 Log.d("Response", text);
+			if(mProgress.isShowing())
+				mProgress.dismiss();
 	     }
 	 }
 }

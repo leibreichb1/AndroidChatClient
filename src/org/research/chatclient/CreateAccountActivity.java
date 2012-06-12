@@ -64,7 +64,7 @@ public class CreateAccountActivity extends Activity {
 					username = userText.getText().toString();
 					if(username != "" && c2dm != ""){
 				    	try{
-				    		HttpPost httppost = new HttpPost("http://devimiiphone1.nku.edu/research_chat_client/TestPhp/CreateNewUser.php");
+				    		HttpPost httppost = new HttpPost("http://devimiiphone1.nku.edu/research_chat_client/testphp/create_new_user.php");
 				    		LinkedList<NameValuePair> nameValuePairs = new LinkedList<NameValuePair>();
 				    		
 				    		nameValuePairs.add(new BasicNameValuePair("username", username));

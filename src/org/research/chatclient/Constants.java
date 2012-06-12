@@ -8,6 +8,7 @@ public interface Constants extends BaseColumns {
 	
 	// Columns in the Events database
 	public static final String SENDER = "sender";
+	public static final String RECIPIENT = "recipient";
 	public static final String MESSAGE = "message";
 	public static final String TIMESTAMP = "timestamp";
 }

@@ -21,8 +21,10 @@ import org.json.JSONException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -30,9 +32,11 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
-public class StartNewConversation extends Activity{
+public class ConversationActivity extends Activity implements Constants{
 	
+	private SQLiteDatabase db;
 	private ProgressDialog mProgress;
 	private SharedPreferences mPrefs;
 	private JSONArray mUsers;
@@ -40,14 +44,16 @@ public class StartNewConversation extends Activity{
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.start_convo);
+		setContentView(R.layout.conversation);
+		MessagesTable table = new MessagesTable(ConversationActivity.this);
+		db = table.getWritableDatabase();
 		mPrefs = getSharedPreferences( CreateAccountActivity.PREFS, Context.MODE_PRIVATE );
-		mProgress = new ProgressDialog(StartNewConversation.this);
+		mProgress = new ProgressDialog(ConversationActivity.this);
 	    mProgress.setIndeterminate(true);
 	    mProgress.setCancelable(false);
 	    mProgress.setMessage("Getting Users...");
 	    mProgress.show();
-		new GetUsersTask().execute(new HttpGet("http://devimiiphone1.nku.edu/research_chat_client/TestPhp/GetUsers.php"));
+		new GetUsersTask().execute(new HttpGet("http://devimiiphone1.nku.edu/research_chat_client/testphp/get_users.php"));
 	}
 	
 	public void sendMessage(View v){
@@ -55,23 +61,19 @@ public class StartNewConversation extends Activity{
 		EditText messBox = (EditText)findViewById(R.id.messageText);
 		String message = messBox.getText().toString();
 		String sender = mPrefs.getString(CreateAccountActivity.USER, "");
+		String time = "" + System.currentTimeMillis();
 		if(!message.equals("")){
+			insertMessage(sender, message, time);
 			try{
-	    		HttpPost httppost = new HttpPost("http://devimiiphone1.nku.edu/research_chat_client/TestPhp/SendMessage.php");
+	    		HttpPost httppost = new HttpPost("http://devimiiphone1.nku.edu/research_chat_client/testphp/send_message.php");
 	    		LinkedList<NameValuePair> nameValuePairs = new LinkedList<NameValuePair>();
 	    		
 	    		nameValuePairs.add(new BasicNameValuePair("recipient", "test@test.com"));
 	    		nameValuePairs.add(new BasicNameValuePair("sender", sender));
 	    		nameValuePairs.add(new BasicNameValuePair("message", message));
-	    		nameValuePairs.add(new BasicNameValuePair("time", "" + System.currentTimeMillis()));
+	    		nameValuePairs.add(new BasicNameValuePair("time", "" + time));
 	    		
 	    		httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-	    		
-	    		mProgress = new ProgressDialog(StartNewConversation.this);
-			    mProgress.setIndeterminate(true);
-			    mProgress.setCancelable(false);
-			    mProgress.setMessage("Sending...");
-			    mProgress.show();
 			    
 			    new SendMessageTask().execute(httppost);
 	    		
@@ -123,7 +125,7 @@ public class StartNewConversation extends Activity{
 				for(int i = 0; i < mUsers.length(); i++)
 					users[i] = mUsers.getString(i);
 				Spinner personSpinner = (Spinner)findViewById(R.id.personSpin);
-				ArrayAdapter<String> adapter = new ArrayAdapter<String>(StartNewConversation.this, android.R.layout.simple_spinner_item, users);
+				ArrayAdapter<String> adapter = new ArrayAdapter<String>(ConversationActivity.this, android.R.layout.simple_spinner_item, users);
 				adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 				personSpinner.setAdapter(adapter);
 			} catch (JSONException e) {
@@ -163,13 +165,29 @@ public class StartNewConversation extends Activity{
 			    	 }
 	    		 }
 	    	 }catch (IOException e) {
-				e.printStackTrace();
-			}
-	    	 
-	    	 if(mProgress.isShowing())
-	    		 mProgress.dismiss();
+	    		 e.printStackTrace();
+	    	 }
+	    	 Toast.makeText(ConversationActivity.this, "Message Sent", Toast.LENGTH_LONG).show();
 	    	 Log.d("Response", text);
 	     }
 	 }
+	
+	private void insertMessage(String sender, String message, String time){
+		String recipient = (String)((Spinner)findViewById(R.id.personSpin)).getSelectedItem();
+		
+		ContentValues values = new ContentValues();
+		values.put(SENDER, sender);
+		values.put(RECIPIENT, recipient);
+		values.put(MESSAGE, message);
+		values.put(TIMESTAMP, ""+time);
+		db.insert(MESSAGE_TABLE_NAME, null, values);
+	}
+	
+	@Override
+	public void onBackPressed() {
+		if(db != null && db.isOpen())
+			db.close();
+		super.onBackPressed();
+	}
 }
 
