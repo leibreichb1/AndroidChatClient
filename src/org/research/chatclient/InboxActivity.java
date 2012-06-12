@@ -203,4 +203,11 @@ public class InboxActivity extends Activity implements Constants{
 				mProgress.dismiss();
 	     }
 	 }
+	
+	@Override
+	public void onBackPressed() {
+		if(db != null && db.isOpen())
+			db.close();
+		super.onBackPressed();
+	}
 }
