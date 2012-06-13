@@ -16,7 +16,7 @@ public final class R {
     public static final class id {
         public static final int RelativeLayout1=0x7f060000;
         public static final int button_create_login=0x7f06000e;
-        public static final int close=0x7f06000f;
+        public static final int close=0x7f060011;
         public static final int contact_name=0x7f060001;
         public static final int contact_recent_msg=0x7f060002;
         public static final int contact_time=0x7f060003;
@@ -27,8 +27,10 @@ public final class R {
         public static final int messageText=0x7f060008;
         public static final int most_recent_msg=0x7f060004;
         public static final int personSpin=0x7f060006;
+        public static final int receivedText=0x7f06000f;
         public static final int rootLay=0x7f060005;
         public static final int sendMessBtn=0x7f060007;
+        public static final int sentdText=0x7f060010;
         public static final int username=0x7f06000d;
     }
     public static final class layout {
@@ -37,6 +39,8 @@ public final class R {
         public static final int conversation_list=0x7f030002;
         public static final int header=0x7f030003;
         public static final int main=0x7f030004;
+        public static final int received_view=0x7f030005;
+        public static final int sent_view=0x7f030006;
     }
     public static final class menu {
         public static final int menu=0x7f050000;
