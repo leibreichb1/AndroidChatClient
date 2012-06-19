@@ -59,13 +59,16 @@ public class ConversationActivity extends BaseActivity implements Constants{
 		String message = messBox.getText().toString();
 		String sender = mPrefs.getString(CreateAccountActivity.USER, "");
 		String time = "" + System.currentTimeMillis();
+		Spinner spin = (Spinner)findViewById(R.id.personSpin);
+		String recipient = (String)spin.getSelectedItem();
+		Log.d("selected", recipient);
 		if(!message.equals("")){
 			insertMessage(sender, message, time);
 			try{
 	    		HttpPost httppost = new HttpPost("http://devimiiphone1.nku.edu/research_chat_client/testphp/send_message.php");
 	    		LinkedList<NameValuePair> nameValuePairs = new LinkedList<NameValuePair>();
 	    		
-	    		nameValuePairs.add(new BasicNameValuePair("recipient", "test@test.com"));
+	    		nameValuePairs.add(new BasicNameValuePair("recipient", recipient));
 	    		nameValuePairs.add(new BasicNameValuePair("sender", sender));
 	    		nameValuePairs.add(new BasicNameValuePair("message", message));
 	    		nameValuePairs.add(new BasicNameValuePair("time", "" + time));

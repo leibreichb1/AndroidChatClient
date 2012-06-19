@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.apache.http.HttpEntity;
@@ -25,9 +28,11 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,10 +42,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 public class InboxActivity extends BaseActivity implements Constants{
 	
+	private ListView lv;
 	private SQLiteDatabase db;
 	private ProgressDialog mProgress;
 	private SharedPreferences mPrefs;
@@ -72,7 +79,8 @@ public class InboxActivity extends BaseActivity implements Constants{
 		    mProgress.show();
 		    
 		    new DownloadMessages().execute(httppost);
-    		ListView lv = (ListView)findViewById(R.id.conversation_list);
+    		lv = (ListView)findViewById(R.id.conversation_list);
+    		loadList();
     		registerForContextMenu(lv);
     	}catch(UnsupportedEncodingException e){
     		e.printStackTrace();
@@ -102,6 +110,46 @@ public class InboxActivity extends BaseActivity implements Constants{
 	public void startNewMessage(View v){
 		Intent startNewMessage = new Intent(this, ConversationActivity.class);
 		startActivity(startNewMessage);
+	}
+	
+	private void loadList(){
+		Cursor idCursor = db.rawQuery("Select distinct " + OTHER_MEMBER + " from " + MESSAGE_TABLE_NAME, null);
+		ArrayList<String> members = new ArrayList<String>();
+		while(idCursor.moveToNext()){
+			if(idCursor != null){
+				members.add(idCursor.getString(idCursor.getColumnIndex(OTHER_MEMBER)));
+			}
+		}
+		idCursor.close();
+		String[] memArray;
+		memArray = members.toArray(new String[0]);
+		ArrayList<HashMap<String,String>> convos = new ArrayList<HashMap<String,String>>();
+		for (int i = 0; i < memArray.length; i++) {
+			Cursor convoCursor = db.rawQuery("Select * from " + MESSAGE_TABLE_NAME + " where " + OTHER_MEMBER + "='" + memArray[i] + "' order by " + TIMESTAMP + " DESC", null);
+			if(convoCursor.moveToFirst()){
+				HashMap<String, String> map = new HashMap<String, String>();
+	   	        map.put( "name", convoCursor.getString(convoCursor.getColumnIndex(OTHER_MEMBER)) );
+	   	        map.put( "message", convoCursor.getString(convoCursor.getColumnIndex(MESSAGE)) );
+	   	        map.put( "time", formatTime(convoCursor.getString(convoCursor.getColumnIndex(TIMESTAMP))) );
+	   	        Log.d("MAP", map.toString());
+				convos.add(map);
+			}
+		}
+		lv.setAdapter(new SimpleAdapter(InboxActivity.this, convos, R.layout.list_item, new String[] {"name", "message", "time"}, new int[] { R.id.from_text, R.id.message_text, R.id.date_text}));
+	}
+	
+	private String formatTime(String str){
+		String pattern = "MM/dd/yy hh:mm a";
+	    SimpleDateFormat format = new SimpleDateFormat(pattern);
+	    String date =  format.format(new Date(Long.valueOf(str)));
+	    return date;
+	}
+	
+	@Override
+	public void onBackPressed() {
+		if(db != null && db.isOpen())
+			db.close();
+		super.onBackPressed();
 	}
 	
 	class ConvoAdapter extends BaseAdapter{
@@ -189,6 +237,7 @@ public class InboxActivity extends BaseActivity implements Constants{
 					ContentValues values = new ContentValues();
 					values.put(SENDER, obj.getString(SENDER));
 					values.put(RECIPIENT, recipient);
+					values.put(OTHER_MEMBER, obj.getString(SENDER));
 					values.put(MESSAGE, obj.getString(MESSAGE));
 					values.put(TIMESTAMP, obj.getString(TIMESTAMP));
 					db.insert(MESSAGE_TABLE_NAME, null, values);

@@ -9,6 +9,8 @@ public interface Constants extends BaseColumns {
 	// Columns in the Events database
 	public static final String SENDER = "sender";
 	public static final String RECIPIENT = "recipient";
+	public static final String OTHER_MEMBER = "other_member";
 	public static final String MESSAGE = "message";
 	public static final String TIMESTAMP = "timestamp";
+	public static final String CONVERSATION_ID = "conversation_id";
 }

@@ -17,7 +17,7 @@ public class MessagesTable extends SQLiteOpenHelper implements Constants{
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 	db.execSQL("CREATE TABLE " + MESSAGE_TABLE_NAME + " (" + _ID
-	+ " INTEGER PRIMARY KEY AUTOINCREMENT, "+ SENDER + " TEXT, " + RECIPIENT + " TEXT, " + MESSAGE + " TEXT, " + TIMESTAMP + " TEXT);" );
+	+ " INTEGER PRIMARY KEY AUTOINCREMENT, "+ SENDER + " TEXT, " + RECIPIENT + " TEXT, " + OTHER_MEMBER + " TEXT, " + MESSAGE + " TEXT, " + TIMESTAMP + " TEXT);" );
 	}
 
 	@Override

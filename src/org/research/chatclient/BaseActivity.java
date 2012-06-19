@@ -74,6 +74,7 @@ public class BaseActivity extends Activity implements Constants{
 		ContentValues values = new ContentValues();
 		values.put(SENDER, sender);
 		values.put(RECIPIENT, recipient);
+		values.put(OTHER_MEMBER, recipient);
 		values.put(MESSAGE, message);
 		values.put(TIMESTAMP, ""+time);
 		db.insert(MESSAGE_TABLE_NAME, null, values);
