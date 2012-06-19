@@ -40,6 +40,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -51,7 +52,8 @@ public class InboxActivity extends BaseActivity implements Constants{
 	private SQLiteDatabase db;
 	private ProgressDialog mProgress;
 	private SharedPreferences mPrefs;
-	public static String CONVO = "convo";
+	public static final String CONVO = "convo";
+	public static final String CONVO_USER = "convo_user";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +125,7 @@ public class InboxActivity extends BaseActivity implements Constants{
 		idCursor.close();
 		String[] memArray;
 		memArray = members.toArray(new String[0]);
-		ArrayList<HashMap<String,String>> convos = new ArrayList<HashMap<String,String>>();
+		final ArrayList<HashMap<String,String>> convos = new ArrayList<HashMap<String,String>>();
 		for (int i = 0; i < memArray.length; i++) {
 			Cursor convoCursor = db.rawQuery("Select * from " + MESSAGE_TABLE_NAME + " where " + OTHER_MEMBER + "='" + memArray[i] + "' order by " + TIMESTAMP + " DESC", null);
 			if(convoCursor.moveToFirst()){
@@ -136,6 +138,15 @@ public class InboxActivity extends BaseActivity implements Constants{
 			}
 		}
 		lv.setAdapter(new SimpleAdapter(InboxActivity.this, convos, R.layout.list_item, new String[] {"name", "message", "time"}, new int[] { R.id.from_text, R.id.message_text, R.id.date_text}));
+		lv.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Intent loadChat = new Intent(InboxActivity.this, ConversationActivity.class);
+				loadChat.putExtra(CONVO_USER, convos.get(position).get("name"));
+				startActivity(loadChat);
+			}
+		});
 	}
 	
 	private String formatTime(String str){

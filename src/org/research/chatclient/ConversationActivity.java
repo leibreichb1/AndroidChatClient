@@ -39,18 +39,27 @@ public class ConversationActivity extends BaseActivity implements Constants{
 	private ProgressDialog mProgress;
 	private SharedPreferences mPrefs;
 	private JSONArray mUsers;
+	private Spinner spin;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.conversation);
-		mPrefs = getSharedPreferences( CreateAccountActivity.PREFS, Context.MODE_PRIVATE );
-		mProgress = new ProgressDialog(ConversationActivity.this);
-	    mProgress.setIndeterminate(true);
-	    mProgress.setCancelable(false);
-	    mProgress.setMessage("Getting Users...");
-	    mProgress.show();
-		new GetUsersTask().execute(new HttpGet("http://devimiiphone1.nku.edu/research_chat_client/testphp/get_users.php"));
+		spin = (Spinner)findViewById(R.id.personSpin);
+		String convo = getIntent().getStringExtra(InboxActivity.CONVO_USER);
+	    if(convo != null){
+	    	spin.setAdapter(new ArrayAdapter<String>(ConversationActivity.this, android.R.layout.simple_spinner_item, new String[]{convo}));
+	    	spin.setClickable(false);
+	    }
+	    else{
+			mPrefs = getSharedPreferences( CreateAccountActivity.PREFS, Context.MODE_PRIVATE );
+			mProgress = new ProgressDialog(ConversationActivity.this);
+		    mProgress.setIndeterminate(true);
+		    mProgress.setCancelable(false);
+		    mProgress.setMessage("Getting Users...");
+		    mProgress.show();
+	    	new GetUsersTask().execute(new HttpGet("http://devimiiphone1.nku.edu/research_chat_client/testphp/get_users.php"));
+	    }
 	}
 	
 	public void sendMessage(View v){
@@ -59,7 +68,6 @@ public class ConversationActivity extends BaseActivity implements Constants{
 		String message = messBox.getText().toString();
 		String sender = mPrefs.getString(CreateAccountActivity.USER, "");
 		String time = "" + System.currentTimeMillis();
-		Spinner spin = (Spinner)findViewById(R.id.personSpin);
 		String recipient = (String)spin.getSelectedItem();
 		Log.d("selected", recipient);
 		if(!message.equals("")){
