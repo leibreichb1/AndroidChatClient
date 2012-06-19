@@ -27,18 +27,17 @@ public class C2DMReceiver extends BroadcastReceiver{
 	    	Editor editor = context.getSharedPreferences( CreateAccountActivity.PREFS, Context.MODE_PRIVATE).edit();
             editor.putString(CreateAccountActivity.C2DM, registration);
     		editor.commit();
-    		NotificationManager mManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-			Notification notification = new Notification(android.R.drawable.stat_notify_voicemail, "Notify", System.currentTimeMillis());
-			notification.flags |= Notification.FLAG_AUTO_CANCEL;
-			notification.defaults |= Notification.DEFAULT_ALL;
-			PendingIntent pendIntent = PendingIntent.getActivity( context, 0, null, PendingIntent.FLAG_CANCEL_CURRENT);
-			notification.setLatestEventInfo(context, "registered", "ready to create", pendIntent );
-			mManager.notify(0, notification);
 	    }
 	}
 
 	private void handleMessage(Context context, Intent intent)
 	{
-		Log.d("MESSAGE", "M: " + intent.getStringExtra("message"));
+		NotificationManager mManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+		Notification notification = new Notification(android.R.drawable.stat_notify_voicemail, "Notify", System.currentTimeMillis());
+		notification.flags |= Notification.FLAG_AUTO_CANCEL;
+		notification.defaults |= Notification.DEFAULT_ALL;
+		PendingIntent pendIntent = PendingIntent.getActivity( context, 0, new Intent(context, InboxActivity.class), PendingIntent.FLAG_CANCEL_CURRENT);
+		notification.setLatestEventInfo(context, "Chat Client", "You have a new Message", pendIntent );
+		mManager.notify(0, notification);
 	}
 }
