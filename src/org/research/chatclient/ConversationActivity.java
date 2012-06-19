@@ -129,6 +129,13 @@ public class ConversationActivity extends BaseActivity implements Constants{
     		mProgress.dismiss();
 	}
 	
+	@Override
+	public void onBackPressed() {
+		if(db != null && db.isOpen())
+			db.close();
+		super.onBackPressed();
+	}
+	
 	private class GetUsersTask extends AsyncTask<HttpGet, Void, InputStream> {
 	    @Override
 		 protected InputStream doInBackground(HttpGet... post) {
