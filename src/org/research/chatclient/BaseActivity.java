@@ -64,7 +64,7 @@ public class BaseActivity extends Activity implements Constants{
 	    		 e.printStackTrace();
 	    	 }
 	    	 Toast.makeText(BaseActivity.this, "Message Sent", Toast.LENGTH_LONG).show();
-	    	 Log.d("Response", text);
+	    	 Log.d("Response", "TIME: " + text);
 	     }
 	 }
 	

@@ -53,12 +53,12 @@ public class ConversationActivity extends BaseActivity implements Constants{
 		db = table.getWritableDatabase();
 		spin = (Spinner)findViewById(R.id.personSpin);
 		convoScroll = (ScrollView)findViewById(R.id.convoScroll);
-		convoScroll.post(new Runnable() {
+		convoScroll.postDelayed(new Runnable() {
 			@Override
 			public void run() {
 				((ScrollView)findViewById(R.id.convoScroll)).fullScroll(ScrollView.FOCUS_DOWN);
 			}
-		});
+		}, 500);
 		String convo = getIntent().getStringExtra(InboxActivity.CONVO_USER);
 	    if(convo != null){
 	    	mPrefs = getSharedPreferences( CreateAccountActivity.PREFS, Context.MODE_PRIVATE );
@@ -100,6 +100,7 @@ public class ConversationActivity extends BaseActivity implements Constants{
 			tv.setText(message);
 			LinearLayout wrapper = (LinearLayout)findViewById(R.id.convoLay);
 			wrapper.addView(v);
+			convoScroll.scrollBy(0, 50);
 			try{
 	    		HttpPost httppost = new HttpPost("http://devimiiphone1.nku.edu/research_chat_client/testphp/send_message.php");
 	    		LinkedList<NameValuePair> nameValuePairs = new LinkedList<NameValuePair>();
@@ -107,7 +108,7 @@ public class ConversationActivity extends BaseActivity implements Constants{
 	    		nameValuePairs.add(new BasicNameValuePair("recipient", recipient));
 	    		nameValuePairs.add(new BasicNameValuePair("sender", sender));
 	    		nameValuePairs.add(new BasicNameValuePair("message", message));
-	    		nameValuePairs.add(new BasicNameValuePair("time", "" + time));
+	    		nameValuePairs.add(new BasicNameValuePair("time", time));
 	    		
 	    		httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 			    
