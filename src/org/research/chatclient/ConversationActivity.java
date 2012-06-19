@@ -32,6 +32,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -42,6 +43,7 @@ public class ConversationActivity extends BaseActivity implements Constants{
 	private SharedPreferences mPrefs;
 	private JSONArray mUsers;
 	private Spinner spin;
+	private ScrollView convoScroll;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +52,13 @@ public class ConversationActivity extends BaseActivity implements Constants{
 		MessagesTable table = new MessagesTable(ConversationActivity.this);
 		db = table.getWritableDatabase();
 		spin = (Spinner)findViewById(R.id.personSpin);
+		convoScroll = (ScrollView)findViewById(R.id.convoScroll);
+		convoScroll.post(new Runnable() {
+			@Override
+			public void run() {
+				((ScrollView)findViewById(R.id.convoScroll)).fullScroll(ScrollView.FOCUS_DOWN);
+			}
+		});
 		String convo = getIntent().getStringExtra(InboxActivity.CONVO_USER);
 	    if(convo != null){
 	    	mPrefs = getSharedPreferences( CreateAccountActivity.PREFS, Context.MODE_PRIVATE );

@@ -37,8 +37,9 @@
 			    android:background="#000"
 			    android:orientation="vertical">
 			    <ScrollView 
-			       android:layout_width="match_parent"
-			       android:layout_height="wrap_content" >
+		        	android:id="@+id/convoScroll"
+			       	android:layout_width="match_parent"
+			       	android:layout_height="wrap_content" >
 			        <LinearLayout 
 					    android:id="@+id/convoLay"
 					    android:layout_width="match_parent"

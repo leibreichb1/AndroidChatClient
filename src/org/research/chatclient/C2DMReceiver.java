@@ -33,7 +33,7 @@ public class C2DMReceiver extends BroadcastReceiver{
 	private void handleMessage(Context context, Intent intent)
 	{
 		NotificationManager mManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification notification = new Notification(android.R.drawable.stat_notify_voicemail, "Notify", System.currentTimeMillis());
+		Notification notification = new Notification(android.R.drawable.stat_notify_voicemail, "Chat Client", System.currentTimeMillis());
 		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 		notification.defaults |= Notification.DEFAULT_ALL;
 		PendingIntent pendIntent = PendingIntent.getActivity( context, 0, new Intent(context, InboxActivity.class), PendingIntent.FLAG_CANCEL_CURRENT);
