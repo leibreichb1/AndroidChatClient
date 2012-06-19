@@ -78,12 +78,19 @@ public class ConversationActivity extends BaseActivity implements Constants{
 		
 		EditText messBox = (EditText)findViewById(R.id.messageText);
 		String message = messBox.getText().toString();
+		messBox.setText("");
 		String sender = mPrefs.getString(CreateAccountActivity.USER, "");
 		String time = "" + System.currentTimeMillis();
 		String recipient = (String)spin.getSelectedItem();
 		Log.d("selected", recipient);
 		if(!message.equals("")){
 			insertMessage(sender, message, time);
+			LayoutInflater inflate = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			v = inflate.inflate(R.layout.sent_view, null, false);
+			TextView tv = (TextView) v.findViewById(R.id.sentText);
+			tv.setText(message);
+			LinearLayout wrapper = (LinearLayout)findViewById(R.id.convoLay);
+			wrapper.addView(v);
 			try{
 	    		HttpPost httppost = new HttpPost("http://devimiiphone1.nku.edu/research_chat_client/testphp/send_message.php");
 	    		LinkedList<NameValuePair> nameValuePairs = new LinkedList<NameValuePair>();
