@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -34,6 +35,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,11 +44,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class InboxActivity extends BaseActivity implements Constants{
 	
@@ -89,6 +94,7 @@ public class InboxActivity extends BaseActivity implements Constants{
     		e.printStackTrace();
     	}
 	}
+	
 	@Override
     public boolean onCreateOptionsMenu( Menu menu ){
     	super.onCreateOptionsMenu( menu );
@@ -97,14 +103,21 @@ public class InboxActivity extends BaseActivity implements Constants{
     	return true;
     }
 	
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		// TODO Auto-generated method stub
+		super.onCreateContextMenu(menu, v, menuInfo);
+		menu.setHeaderTitle("Context Menu");  
+	    menu.add(0, v.getId(), 0, "Delete Conversation");
+	}
+	
 	@Override 
-    public boolean onContextItemSelected(MenuItem item) { 
-    	if( item.getItemId() == 0 || item.getItemId() == 1 ){
-    		AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
-    	}
-    	switch( item.getItemId() ){
-    		case 0:
-    			break;
+    public boolean onContextItemSelected(MenuItem item) {
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+    	if(item.getTitle().toString().equals("Delete Conversation")){
+    		HashMap<String, String> map = (HashMap<String, String>) lv.getItemAtPosition((int)info.id);
+			deleteConvo(map.get("name"));
     	}
         return true; 
     } 
@@ -148,12 +161,17 @@ public class InboxActivity extends BaseActivity implements Constants{
 			}
 		});
 	}
-	
+
 	private String formatTime(String str){
 		String pattern = "MM/dd/yy hh:mm a";
 	    SimpleDateFormat format = new SimpleDateFormat(pattern);
 	    String date =  format.format(new Date(Long.valueOf(str)));
 	    return date;
+	}
+
+	private void deleteConvo(String name){
+		db.delete(MESSAGE_TABLE_NAME, OTHER_MEMBER + "=?", new String[] {name});
+		loadList();
 	}
 	
 	@Override
