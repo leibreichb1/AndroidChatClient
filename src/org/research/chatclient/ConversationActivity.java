@@ -20,6 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.app.ProgressDialog;
+import android.text.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -29,12 +30,14 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ConversationActivity extends BaseActivity implements Constants{
 	
@@ -128,16 +131,38 @@ public class ConversationActivity extends BaseActivity implements Constants{
     			View v = null;
     			if(convoCursor.getString(convoCursor.getColumnIndex(RECIPIENT)).equals(convoCursor.getString(convoCursor.getColumnIndex(OTHER_MEMBER)))){
     				v = inflate.inflate(R.layout.sent_view, null, false);
-    				TextView tv = (TextView) v.findViewById(R.id.sentText);
+    				final TextView tv = (TextView) v.findViewById(R.id.sentText);
     				tv.setText(convoCursor.getString(convoCursor.getColumnIndex(MESSAGE)));
     				LinearLayout wrapper = (LinearLayout)findViewById(R.id.convoLay);
+    				v.setOnLongClickListener(new OnLongClickListener() {
+						
+						@SuppressWarnings("deprecation")
+						@Override
+						public boolean onLongClick(View v) {
+							ClipboardManager cm = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+							cm.setText(tv.getText().toString());
+							Toast.makeText(ConversationActivity.this, "Copied \"" + tv.getText().toString() + "\" to the clipboard.", Toast.LENGTH_SHORT).show();
+							return true;
+						}
+					});
     				wrapper.addView(v);
     			}
     			if(convoCursor.getString(convoCursor.getColumnIndex(SENDER)).equals(convoCursor.getString(convoCursor.getColumnIndex(OTHER_MEMBER)))){
     				v = inflate.inflate(R.layout.received_view, null, false);
-    				TextView tv = (TextView) v.findViewById(R.id.receivedText);
+    				final TextView tv = (TextView) v.findViewById(R.id.receivedText);
     				tv.setText(convoCursor.getString(convoCursor.getColumnIndex(MESSAGE)));
     				LinearLayout wrapper = (LinearLayout)findViewById(R.id.convoLay);
+    				v.setOnLongClickListener(new OnLongClickListener() {
+						
+						@SuppressWarnings("deprecation")
+						@Override
+						public boolean onLongClick(View v) {
+							ClipboardManager cm = (ClipboardManager)getSystemService(Context.CLIPBOARD_SERVICE);
+							cm.setText(tv.getText().toString());
+							Toast.makeText(ConversationActivity.this, "Copied \"" + tv.getText().toString() + "\" to the clipboard.", Toast.LENGTH_SHORT).show();
+							return true;
+						}
+					});
     				wrapper.addView(v);
     			}
     		}
